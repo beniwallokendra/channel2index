@@ -32,29 +32,40 @@ def post(token, source, posts):
 </div>
 	''' % (source.description.split()[0], ''.join(posts))
 	r = p.post(
-		title = source.title + '频道手册', 
+		title = '【频道手册】' + source.title, 
 		author = source.title, 
 		author_url = author_url,
 		text = text)
-	print(r)
 	return r['url']
 
 TEST = -1001181967872
-CUT = [':', '：', '\n', '.']
+CUT = [':', '：', '\n', '.', '-']
 
 def trim(t):
+	pivot = 'telegra.ph/'
+	if pivot in t:
+		index = t.find(pivot)
+		t = t[index + len(pivot):]
+	if t.startswith('http'):
+		return t
 	for c in CUT:
 		t = t.split(c)[0]
 	return t
 
-def getBrief(r):
+def getBriefRaw(r):
 	if r.document:
-		return trim(r.document.file_name)
+		return r.document.file_name
+	if r.poll:
+		return r.poll.question
 	if r.text: 
-		return trim(r.text)
-	else:
-		print(r)
-		return 'xx'
+		return r.text
+	return ''
+
+def getBrief(r):
+	b = trim(getBriefRaw(r))
+	if len(b) > 35:
+		return b[:30] + '...'
+	return b
 
 def gen(source, bot_token, telegraph_token=None):
 	tele = Updater(bot_token, use_context=True)
@@ -74,13 +85,13 @@ def gen(source, bot_token, telegraph_token=None):
 			continue
 		skip = 0
 		brief = getBrief(r)
-		link = 't.me/%s/%s' % (source.username, raw_index)
+		if not brief:
+			continue
+		link = 'https://t.me/%s/%s' % (source.username, raw_index)
 		real_index += 1
 		posts.append(
-			'<div>%d.<a href="%s">%s</a></div>' % 
+			'<p>%d.<a href="%s">%s</a></p>' % 
 			(real_index, link, brief))
-		if raw_index > 10:
-			break
-	post(telegraph_token, source, posts)
+	return post(telegraph_token, source, posts)
 		
 

@@ -10,7 +10,7 @@ with open('CREDENTIALS.yaml') as f:
 
 def test():
 	link = channel2index.gen(
-		'https://t.me/freedom_watch', 
+		'https://t.me/equality_and_rights', 
 		bot_token = CREDENTIALS['bot_token'],
 		telegraph_token = CREDENTIALS['telegraph_token'])
 	os.system('open %s -g' % link)
