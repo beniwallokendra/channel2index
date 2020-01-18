@@ -15,4 +15,5 @@ def test():
 		telegraph_token = CREDENTIALS['telegraph_token'])
 	os.system('open %s -g' % link)
 	
-test()
+if __name__ == "__main__":
+	test()
