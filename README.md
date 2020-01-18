@@ -6,7 +6,10 @@ Telegram Channel to Index File
 
 ```
 import channel2index
-channel2index.gen(CHANNEL_USERNAME, /*optional*/telegraph_token = TOKEN)
+channel2index.gen(
+	CHANNEL_USERNAME, 
+	bot_token = BOT_TOKEN, 
+	/*optional*/ telegraph_token = TELEGRAPH_TOKEN)
 ```
 
 ## how to install
