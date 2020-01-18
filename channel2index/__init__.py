@@ -42,6 +42,7 @@ def post(token, source, posts):
 
 TEST = -1001181967872
 CUT = ['\n', '-']
+STRIP = [':', '：']
 
 def trim(t):
 	r = re.search(u'[\u4e00-\u9fff]', t)
@@ -51,8 +52,10 @@ def trim(t):
 		return ''
 	for c in CUT:
 		t = t.split(c)[0]
-	t = t.strip(':')
-	return t.strip(u'：')
+	for s in STRIP:
+		if t.endswith(s):
+			t = t[:-1]
+	return t
 
 def getBriefRaw(r):
 	if r.document:
@@ -65,10 +68,14 @@ def getBriefRaw(r):
 
 def getBrief(r):
 	b = trim(getBriefRaw(r))
-	if 0 < b.find('IMG') < 5:
+	if 0 < b.find('IMG') < 20:
 		return
-	if len(b) > 35:
-		return b[:30] + '...'
+	if re.search(u'[\u4e00-\u9fff]', b):
+		if len(b) > 35:
+			return b[:30] + '...'
+	else:
+		if len(b) > 65:
+			return b[:60] + '...'
 	return b
 
 def gen(source, bot_token, telegraph_token=None):
@@ -100,6 +107,7 @@ def gen(source, bot_token, telegraph_token=None):
 			(real_index, link, brief))
 		if real_index % 40 == 0:
 			r = post(telegraph_token, source, posts)
+			print(r)
 			os.system('open %s -g' % r)
 	return post(telegraph_token, source, posts)
 		
