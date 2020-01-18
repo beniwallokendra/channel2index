@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-name = 'channel2pdf'
+name = 'channel2index'
 
 import os
 from .find_resource import findResource

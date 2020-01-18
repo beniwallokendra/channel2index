@@ -1,15 +1,14 @@
-# channel2pdf
+# channel2index
 
-Export Telegram Channel to PDF
+Telegram Channel to Index File
 
 ## usage
 
 ```
-import channel2pdf
-new_2_pdg.gen(CHANNEL_USERNAME)
+import channel2index
+channel2index.gen(CHANNEL_USERNAME, /*optional*/telegraph_token = TOKEN)
 ```
 
 ## how to install
 
-`sudo -v && wget -nv -O- https://download.calibre-ebook.com/linux-installer.sh | sudo sh /dev/stdin` 
-`pip3 install channel2pdf`
+`pip3 install channel2index`
