@@ -6,9 +6,7 @@ name = 'channel2index'
 import os
 
 from html_telegraph_poster import TelegraphPoster
-from .article import _getArticle
-from .common import _seemsValidText
-from telegram_util import matchKey
+from telegram.ext import Updater, MessageHandler, Filters
 
 def getPoster(token):
 	if token:

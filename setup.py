@@ -22,6 +22,7 @@ setuptools.setup(
         'html_telegraph_poster',
         'telegram_util>=0.0.27',
         'pyyaml',
+        'python-telegram-bot',
     ],
     python_requires='>=3.0',
 )
