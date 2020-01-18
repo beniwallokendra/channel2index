@@ -5,11 +5,13 @@ name = 'channel2index'
 
 import os
 import time
+import re
 
 from html_telegraph_poster import TelegraphPoster
 import telegram
 import telegram.ext
 from telegram.ext import Updater, MessageHandler, Filters
+from telegram_util import isUrl
 
 def getPoster(token):
 	if token:
@@ -39,30 +41,32 @@ def post(token, source, posts):
 	return r['url']
 
 TEST = -1001181967872
-CUT = [':', '：', '\n', '.', '-']
+CUT = ['\n', '-']
 
 def trim(t):
-	pivot = 'telegra.ph/'
-	if pivot in t:
-		index = t.find(pivot)
-		t = t[index + len(pivot):]
-	if t.startswith('http'):
-		return t
+	r = re.search(u'[\u4e00-\u9fff]', t)
+	if r:
+		t = t[r.span(0)[0]:]
+	if isUrl(t):
+		return ''
 	for c in CUT:
 		t = t.split(c)[0]
-	return t
+	t = t.strip(':')
+	return t.strip(u'：')
 
 def getBriefRaw(r):
 	if r.document:
-		return r.document.file_name
+		return '【文件】' + r.document.file_name
 	if r.poll:
-		return r.poll.question
+		return '【投票】' + r.poll.question
 	if r.text: 
 		return r.text
 	return ''
 
 def getBrief(r):
 	b = trim(getBriefRaw(r))
+	if 0 < b.find('IMG') < 5:
+		return
 	if len(b) > 35:
 		return b[:30] + '...'
 	return b
@@ -76,11 +80,13 @@ def gen(source, bot_token, telegraph_token=None):
 	raw_index = 0
 	real_index = 0
 	skip = 0
-	while skip < 30:
+	while skip < 100:
 		raw_index +=1
 		try:
 			r = tele.bot.forward_message(TEST, source.id, raw_index)
-		except:
+		except Exception as e:
+			if str(e) not in ['Message to forward not found', "Message can't be forwarded"]:
+				print(e)
 			skip += 1
 			continue
 		skip = 0
@@ -92,6 +98,9 @@ def gen(source, bot_token, telegraph_token=None):
 		posts.append(
 			'<p>%d.<a href="%s">%s</a></p>' % 
 			(real_index, link, brief))
+		if real_index % 40 == 0:
+			r = post(telegraph_token, source, posts)
+			os.system('open %s -g' % r)
 	return post(telegraph_token, source, posts)
 		
 
