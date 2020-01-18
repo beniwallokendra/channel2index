@@ -3,14 +3,16 @@
 
 import channel2index
 import os
-import sys
+import yaml
+
+with open('CREDENTIALS.yaml') as f:
+	CREDENTIALS = yaml.load(f, Loader=yaml.FullLoader)
 
 def test():
-	pdf_name = channel2index.gen('pincongessence')
-	os.system('open %s -g' % pdf_name)
-	# pdf_name = channel2index.gen('equality_and_rights')
-	# os.system('open %s -g' % pdf_name)
-	# pdf_name = channel2index.gen('social_justice_watch')
-	# os.system('open %s -g' % pdf_name)
+	link = channel2index.gen(
+		'https://t.me/freedom_watch', 
+		bot_token = CREDENTIALS['bot_token'],
+		telegraph_token = CREDENTIALS['telegraph_token'])
+	os.system('open %s -g' % link)
 	
 test()

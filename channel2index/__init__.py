@@ -4,46 +4,36 @@
 name = 'channel2index'
 
 import os
-from .find_resource import findResource
-from .article import getArticleHtml, getCustomHtml
-from .index import getIndexHtml, cleanName
-from datetime import date
 
-if os.name == 'posix':
-	ebook_convert_app = '/Applications/calibre.app/Contents/MacOS/ebook-convert'
-else:
-	ebook_convert_app = 'ebook-convert'
+from html_telegraph_poster import TelegraphPoster
+from .article import _getArticle
+from .common import _seemsValidText
+from telegram_util import matchKey
 
-def gen(source, ebook_convert_app=ebook_convert_app):
-	name, links, pics, texts = findResource(source)
-	filename = '%s_%s' % (date.today().strftime("%m%d"), name)
-	filename = filename.replace(' ', '_')
+def getPoster(token):
+	if token:
+		return TelegraphPoster(access_token = token)
+	return TelegraphPoster()
 
-	os.system('rm -rf html_result')	
-	os.system('mkdir html_result > /dev/null 2>&1')
+def post(token, source):
+	p = getPoster(token)
+	print(source)
+	if source.username:
+		author_url = 't.me/' + source.username,
+	else:
+		author_url = None
+	r = p.post(
+		title = source.name + '频道手册', 
+		author = source.name, 
+		author_url = author_url,
+		text = str(article.text))
+	return r['url']
 
-	links['图集精选'] = '图集精选'
-	links['消息精选'] = '消息精选'
-	for link, title in links.copy().items():
-		if title == '图集精选':
-			html = getCustomHtml(title, pics, filename + '.html')
-		elif title == '消息精选':
-			html = getCustomHtml(title, texts, filename + '.html')
-		else:
-			html = getArticleHtml(title, link, filename + '.html')
-		if html:
-			with open('html_result/%s.html' % cleanName(title), 'w') as f:
-				f.write(html)
-		else:
-			del links[link]
-
-	index_html_name = 'html_result/%s.html' % filename
-	with open(index_html_name, 'w') as f:
-		f.write(getIndexHtml(name, source, links))
-
-	os.system('mkdir pdf_result > /dev/null 2>&1')
-	pdf_name = 'pdf_result/%s.pdf' % filename
-	os.system('%s %s %s > /dev/null 2>&1' % (ebook_convert_app, index_html_name, pdf_name))
-	return pdf_name
+def gen(source, bot_token, telegraph_token=None):
+	tele = Updater(bot_token, use_context=True)
+	test_channel = tele.bot.get_chat(-1001181967872)
+	source = source.split('/')[-1]
+	source = tele.bot.get_chat(source)
+	post(telegraph_token, source)
 		
 
