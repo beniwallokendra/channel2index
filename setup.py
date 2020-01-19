@@ -23,6 +23,8 @@ setuptools.setup(
         'telegram_util>=0.0.27',
         'pyyaml',
         'python-telegram-bot',
+        'cached_url>=0.0.1',
+        'bs4',
     ],
     python_requires='>=3.0',
 )
