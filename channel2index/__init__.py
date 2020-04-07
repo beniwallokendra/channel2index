@@ -15,7 +15,7 @@ from telegram_util import isUrl
 import cached_url
 from bs4 import BeautifulSoup
 
-PSIZE = 40
+PSIZE = 200
 
 def getPoster(token):
 	if token:
@@ -39,9 +39,10 @@ def getList(db, start, end):
 	return ''.join(posts[start:end])
 
 def post(token, source, db, page):
+	return
 	p = getPoster(token)
 	if source.username:
-		author_url = 'https://t.me/' + source.username,
+		author_url = 'https://t.me/' + source.username
 	else:
 		author_url = None
 	content = getList(db, (page - 1) * PSIZE, page * PSIZE)
@@ -119,6 +120,11 @@ def gen(source, bot_token, telegraph_token=None):
 				page += 1
 	r = post(telegraph_token, source, db, page)
 	os.system('open %s -g' % r)
-	return post(telegraph_token, source, posts)
+	with open('tmp/all_text.txt', 'w') as f:
+		lines = []
+		for raw in db:
+			lines.append(db[raw][0])
+		f.write('\n'.join(lines))
+
 		
 
