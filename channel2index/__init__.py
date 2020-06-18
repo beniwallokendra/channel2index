@@ -61,6 +61,7 @@ def post(token, source, db, page):
 		author = source.title, 
 		author_url = author_url,
 		text = text)
+	print(r['url'])
 	return r['url']
 
 def trim(text):
