@@ -39,7 +39,6 @@ def getList(db, start, end):
 	return ''.join(posts[start:end])
 
 def post(token, source, db, page):
-	return
 	p = getPoster(token)
 	if source.username:
 		author_url = 'https://t.me/' + source.username
@@ -61,7 +60,6 @@ def post(token, source, db, page):
 		author = source.title, 
 		author_url = author_url,
 		text = text)
-	print(r['url'])
 	return r['url']
 
 def trim(text):
