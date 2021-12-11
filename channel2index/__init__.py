@@ -15,28 +15,23 @@ from telegram_util import isUrl
 import cached_url
 from bs4 import BeautifulSoup
 
-PSIZE = 200
-
 def getPoster(token):
 	if token:
 		return TelegraphPoster(access_token = token)
 	return TelegraphPoster()
 
-def getList(db, start, end):
-	print(start, end, len(db))
+def getList(db):
 	real_index = 0
-	raw = 0
-	posts = []
 	while real_index < len(db):
 		raw += 1
 		if raw not in db:
 			continue
-		brief, message_type, link = db[raw]
+		brief, link = db[raw]
 		real_index += 1
 		posts.append(
 			'<p>%d. <a href="%s">%s</a></p>' % 
 			(real_index, link, brief))
-	return ''.join(posts[start:end])
+	return ''.join(posts)
 
 def post(token, source, db, page):
 	p = getPoster(token)
@@ -44,7 +39,7 @@ def post(token, source, db, page):
 		author_url = 'https://t.me/' + source.username
 	else:
 		author_url = None
-	content = getList(db, (page - 1) * PSIZE, page * PSIZE)
+	content = getList(db)
 	text = '''	
 <div>
 	<p><strong>【频道简介】</strong></p>
@@ -56,7 +51,7 @@ def post(token, source, db, page):
 </div>
 	''' % (source.description.split()[0], author_url, content)
 	r = p.post(
-		title = '【频道手册】%s 第%d页' % (source.title, page), 
+		title = '【频道手册】%s ' % source.title,
 		author = source.title, 
 		author_url = author_url,
 		text = text)
@@ -90,40 +85,20 @@ def process(soup, db):
 			
 def gen(source, bot_token, telegraph_token=None):
 	tele = Updater(bot_token, use_context=True)
-	test_channel = tele.bot.get_chat(-1001181967872)
+	test_channel = tele.bot.get_chat(420074357)
 	source = source.split('/')[-1]
 	source = tele.bot.get_chat('@' + source)
 	db = {}
-	raw_index = 0
-	real_index = 0
-	skip = 0
-	page = 1
-	while skip < 20:
-		raw_index +=5
-		link = 'https://t.me/s/%s/%s' % (source.username, raw_index)
+	for message_id in range(960, 1251):
+		print(test_channel.id, source.id, message_id)
 		try:
-			soup = BeautifulSoup(cached_url.get(link), 'html.parser')
-		except Exception as e:
-			print(e)
-			skip += 1
+			message = tele.bot.forward_message(test_channel.id, source.id, message_id)
+		except:
 			continue
-		old_len = len(db)
-		process(soup, db)
-		if old_len == len(db):
-			skip +=1
-		else:
-			skip = 0
-			if len(db) >= page * PSIZE:
-				r = post(telegraph_token, source, db, page)
-				os.system('open %s -g' % r)
-				page += 1
-	r = post(telegraph_token, source, db, page)
-	os.system('open %s -g' % r)
-	with open('tmp/all_text.txt', 'w') as f:
-		lines = []
-		for raw in db:
-			lines.append(db[raw][0])
-		f.write('\n'.join(lines))
+		print(message)
+		break
+		db[message_id] = '1', 'https://t.me/%s/%d' % (source.username, message_id)
+	post(telegraph_token, source, db, page)
 
 		
 

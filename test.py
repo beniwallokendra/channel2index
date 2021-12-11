@@ -10,9 +10,10 @@ with open('CREDENTIALS.yaml') as f:
 
 def test():
 	link = channel2index.gen(
-		'https://t.me/daily_feminist', 
+		'https://t.me/BooksThatMakeYouThink', 
 		bot_token = CREDENTIALS['bot_token'],
 		telegraph_token = CREDENTIALS['telegraph_token'])
+	print(link)
 	os.system('open %s -g' % link)
 	
 if __name__ == "__main__":
